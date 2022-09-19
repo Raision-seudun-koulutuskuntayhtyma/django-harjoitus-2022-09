@@ -7,5 +7,8 @@ class Tapahtuma(models.Model):
     alku = models.DateTimeField()
     loppu = models.DateTimeField()
 
+    def __str__(self):
+        return f"{self.otsikko} ({self.alku}--{self.loppu})"
+
     def kesto(self):
         return self.loppu - self.alku
