@@ -3,10 +3,17 @@ import datetime
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
-
+from django.utils.translation import gettext_lazy as _
 
 
 class Tapahtuma(models.Model):
+    """
+    Varattava tapahtuma.
+
+    Varaus tapahtuu lisäämällä käyttäjä "osallistujat"-listaan.
+    
+    Osallistujien maksimimäärä on määritelty "paikkoja"-kentällä.
+    """
     otsikko = models.CharField(max_length=200)
     kuvaus = models.TextField(blank=True)
     alku = models.DateTimeField()
@@ -16,6 +23,10 @@ class Tapahtuma(models.Model):
         blank=True,
     )
     paikkoja = models.IntegerField()
+    nakyvissa = models.BooleanField(
+        default=False,
+        verbose_name=_("Visible"),
+    )
 
     def __str__(self):
         alku = timezone.localtime(self.alku)
@@ -35,6 +46,14 @@ class Tapahtuma(models.Model):
         return kesto.total_seconds() / 3600
 
     def varaa(self, user):
+        """
+        Varaa tämä tapahtuma annetulle käyttäjälle.
+
+        Palauttaa True, jos tapahtuma saatiin varattua annetulle
+        käyttäjälle tai jos tapahtuma oli jo varattu annetulle
+        käyttäjälle.  Jos tapahtuma oli jo täynnä, eikä varaus siis
+        onnistunut, niin palauttaa False.
+        """
         if user in self.osallistujat.all():
             return True
         osallistujia = self.osallistujat.all().count()
