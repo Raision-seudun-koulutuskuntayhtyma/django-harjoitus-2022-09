@@ -21,10 +21,12 @@
             <input type="hidden" name="toiminto" value="peru"/>
             <input type="submit" value="Peru varaus"/>
         </form>
-    {% else %}
+    {% elif tapahtuma.onko_tilaa %}
         <form method="post">
             {% csrf_token %}
             <input type="submit" value="Osallistun!"/>
         </form>
+    {% else %}
+        Harmi, tapahtuma on jo täynnä.
     {% endif %}
 </html>
